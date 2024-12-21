@@ -10,37 +10,56 @@ class Item:
 
 
 class GildedRose(object):
+    """
+    Manages the quality and sell in of items inside the Gilded Rose shop
+    """
+
     MAX_QUALITY = 50
     MIN_QUALITY = 0
 
     def __init__(self, items):
         self.items = items
 
-    def update_default(self, item: Item):
-        if item.quality > self.MIN_QUALITY:
-            item.quality -= 1
-
-        item.sell_in -= 1
-        if item.sell_in < 0 and item.quality > 0:
-            item.quality -= 1
-
-    def update_aged_brie(self, item: Item):
-        if item.quality < self.MAX_QUALITY:
-            item.quality += 1
-
+    def _update_default_item(self, item: Item):
+        """
+        Once the sell by date has passed, Quality degrades twice as fast
+        The Quality of an item is never negative
+        The Quality of an item is never more than 50
+        """
+        item.quality -= 1
         item.sell_in -= 1
 
-        if item.sell_in < 0 and item.quality < self.MAX_QUALITY:
-            item.quality += 1
+        if item.sell_in < 0:
+            item.quality -= 1
 
-    def update_sulfuras(self, item: Item):
-        # there is nothing to do on sulfuras
-        pass
+        item.quality = min(item.quality, self.MAX_QUALITY)
+        item.quality = max(item.quality, self.MIN_QUALITY)
 
-    def udpate_backstage(self, item: Item):
+    def _update_aged_brie_item(self, item: Item):
+        """
+        Aged Brie actually increases in Quality the older it gets
+        """
 
         item.quality += 1
+        item.sell_in -= 1
 
+        if item.sell_in < 0:
+            item.quality += 1
+
+        item.quality = min(item.quality, self.MAX_QUALITY)
+
+    def _update_sulfuras_item(self, item: Item):
+        """
+        Sulfuras being a legendary item, never has to be sold or decreases in Quality
+        Its Quality is 80 and it never alters
+        """
+        item.quality = 80
+
+    def _udpate_backstage_item(self, item: Item):
+        """
+        Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but quality drops to 0 after the concert
+        """
+        item.quality += 1
         if item.sell_in < 11:
             item.quality += 1
         if item.sell_in < 6:
@@ -52,23 +71,26 @@ class GildedRose(object):
         if item.sell_in < 0:
             item.quality = 0
 
-    def update_conjured(self, item: Item):
-        if item.quality > self.MIN_QUALITY:
-            item.quality -= 2
-
+    def _update_conjured_item(self, item: Item):
+        """
+        Conjured items degrade in Quality twice as fast as normal items
+        """
+        item.quality -= 2
         item.sell_in -= 1
-        if item.sell_in < 0 and item.quality > self.MIN_QUALITY:
+
+        if item.sell_in < 0:
             item.quality -= 2
+        item.quality = max(item.quality, self.MIN_QUALITY)
 
     def update_quality(self):
         for item in self.items:
             if item.name == "Aged Brie":
-                self.update_aged_brie(item)
+                self._update_aged_brie_item(item)
             elif item.name == "Backstage passes to a TAFKAL80ETC concert":
-                self.udpate_backstage(item)
+                self._udpate_backstage_item(item)
             elif item.name == "Sulfuras, Hand of Ragnaros":
-                self.update_sulfuras(item)
+                self._update_sulfuras_item(item)
             elif item.name == "Conjured":
-                self.update_conjured(item)
+                self._update_conjured_item(item)
             else:
-                self.update_default(item)
+                self._update_default_item(item)

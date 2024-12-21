@@ -44,7 +44,7 @@ class GildedRoseTest(unittest.TestCase):
         gilded_rose = GildedRose([item])
         gilded_rose.update_quality()
         gilded_rose.update_quality()
-        self.assertEqual(item.quality, 50)
+        self.assertEqual(item.quality, 80)
         self.assertEqual(item.sell_in, 1)
 
     def test_backstage_quality_rate_increase_by_2_with_10_days_or_less(self):
