@@ -26,10 +26,11 @@ class GildedRose(object):
         The Quality of an item is never negative
         The Quality of an item is never more than 50
         """
-        item.quality -= 1
         item.sell_in -= 1
 
         if item.sell_in < 0:
+            item.quality -= 2
+        else:
             item.quality -= 1
 
         item.quality = min(item.quality, self.MAX_QUALITY)
@@ -40,10 +41,11 @@ class GildedRose(object):
         Aged Brie actually increases in Quality the older it gets
         """
 
-        item.quality += 1
         item.sell_in -= 1
 
         if item.sell_in < 0:
+            item.quality += 2
+        else:
             item.quality += 1
 
         item.quality = min(item.quality, self.MAX_QUALITY)
@@ -59,13 +61,15 @@ class GildedRose(object):
         """
         Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but quality drops to 0 after the concert
         """
-        item.quality += 1
-        if item.sell_in < 11:
-            item.quality += 1
-        if item.sell_in < 6:
+        item.sell_in -= 1
+
+        if item.sell_in <= 5:
+            item.quality += 3
+        elif item.sell_in <= 10:
+            item.quality += 2
+        else:
             item.quality += 1
 
-        item.sell_in -= 1
         item.quality = min(item.quality, self.MAX_QUALITY)
 
         if item.sell_in < 0:
@@ -75,11 +79,13 @@ class GildedRose(object):
         """
         Conjured items degrade in Quality twice as fast as normal items
         """
-        item.quality -= 2
         item.sell_in -= 1
 
         if item.sell_in < 0:
+            item.quality -= 4
+        else:
             item.quality -= 2
+
         item.quality = max(item.quality, self.MIN_QUALITY)
 
     def update_quality(self):
